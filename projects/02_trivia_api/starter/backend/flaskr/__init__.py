@@ -7,6 +7,16 @@ import random
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
+curr_category = 1
+
+
+def paginate(request, selection):
+  page = request.args.get('page', 1, type=int)
+  start = (page - 1) * QUESTIONS_PER_PAGE
+  end = start + QUESTIONS_PER_PAGE
+  questions = [question.format() for question in selection]
+  return questions[start:end]
+
 
 def create_app(test_config=None):
   # create and configure the app
@@ -16,11 +26,11 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
+  CORS(app)
 
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
-  CORS(app)
 
   @app.after_request
   def after_request(response):
@@ -30,18 +40,23 @@ def create_app(test_config=None):
 
   '''
   @TODO: 
-  Create an endpoint to handle GET requests for all available categories.
+  Create an endpoint to handle GET requests 
+  for all available categories.
   '''
   @app.route('/categories')
-  def get_all_categories():
+  def get_categories():
     categories = Category.query.order_by(Category.id).all()
+    formatted_categories = [cat.format() for cat in categories]
 
     # if len(categories) == 0:
     #   abort(404)
     #
+    print('in get categories')
+    print([cat.format() for cat in categories])
+
     return jsonify({
       'success': True,
-      'categories': [cat.format() for cat in categories],
+      'categories': formatted_categories,
       'total_categories': len(categories)
     })
 
@@ -57,6 +72,25 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions')
+  def getQuestions():
+    categories = Category.query.order_by(Category.id).all()
+    formatted_categories = [cat.format() for cat in categories]
+
+    questions = Question.query.order_by(Question.id).all()
+    current_questions = paginate(request, questions)
+    print('in getQuestions')
+
+    if len(current_questions) == 0:
+      abort(404)
+
+    return jsonify({
+      'success': True,
+      'total_questions': len(questions),
+      'questions': current_questions,
+      'current_category': curr_category,
+      'categories': formatted_categories
+    })
 
   '''
   @TODO: 
@@ -115,6 +149,14 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+      'success': False,
+      'error': 404,
+      'message': 'resource not found'
+    }), 404
 
   return app
 
