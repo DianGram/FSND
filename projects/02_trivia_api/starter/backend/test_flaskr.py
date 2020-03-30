@@ -37,12 +37,10 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_all_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
-
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['total_categories'], 6)
         self.assertTrue(data['categories'])
-
 
     def test_get_paginated_questions(self):
         res = self.client().get('/questions')
@@ -59,6 +57,25 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertTrue(data['message'], 'resource not found')
         self.assertTrue(['questions'])
+
+    def test_delete_question(self):
+        question_id = 20
+        res = self.client().delete('/questions/20')
+        data = json.loads(res.data)
+        question = Question.query.filter(Question.id == question_id).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], question_id)
+        self.assertEqual(question, None)
+
+    def test_delete_question_not_exist(self):
+        res = self.client().delete('/questions/99999')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 422)
+        self.assertTrue(data['message'], 'request could not be processed')
+
+
 
 
 
