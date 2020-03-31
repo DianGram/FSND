@@ -73,6 +73,7 @@ def create_app(test_config=None):
     formatted_categories = [cat.format() for cat in categories]
     questions = Question.query.order_by(Question.id).all()
     current_questions = paginate(request, questions)
+    # print('formatted categories', formatted_categories)
 
     if len(current_questions) == 0:
       abort(404)
@@ -95,14 +96,12 @@ def create_app(test_config=None):
 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
-    print('delete question id', question_id)
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
       if question is None:
         abort(404)
 
       question.delete()
-      print('question id is now:', question_id)
 
       return jsonify({
         'success': True,
@@ -134,6 +133,24 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    body = request.get_json()
+    search_term = body.get('searchTerm', '')
+    print('search_term:', search_term)
+
+    questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term))).all()
+    result_questions = paginate(request, questions)
+    # print('questions', result_questions)
+    # print('')
+    print('total_questions:', len(questions))
+    return jsonify({
+      'success': True,
+      'questions': result_questions,
+      'total_questions': len(questions)
+    })
+
 
   '''
   @TODO: 

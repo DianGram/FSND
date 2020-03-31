@@ -58,23 +58,39 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['message'], 'resource not found')
         self.assertTrue(['questions'])
 
-    def test_delete_question(self):
-        question_id = 20
-        res = self.client().delete('/questions/20')
-        data = json.loads(res.data)
-        question = Question.query.filter(Question.id == question_id).one_or_none()
+    # def test_delete_question(self):
+    #     question_id = 20
+    #     res = self.client().delete('/questions/' + question_id)
+    #     data = json.loads(res.data)
+    #     question = Question.query.filter(Question.id == question_id).one_or_none()
+    #
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertEqual(data['deleted'], question_id)
+    #     self.assertEqual(question, None)
+    #
+    # def test_delete_question_not_exist(self):
+    #     res = self.client().delete('/questions/99999')
+    #     data = json.loads(res.data)
+    #     self.assertEqual(res.status_code, 422)
+    #     self.assertEqual(data['success'], False)
+    #     self.assertTrue(data['message'], 'request could not be processed')
 
+    def test_search_questions_results(self):
+        res = self.client().post('/questions/search', json={'searchTerm': 'title'})
+        data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], question_id)
-        self.assertEqual(question, None)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'], 2)
 
-    def test_delete_question_not_exist(self):
-        res = self.client().delete('/questions/99999')
+    def test_search_questions_no_results(self):
+        res = self.client().post('/questions/search', json={'searchTerm': 'kdjfghskdfh'})
         data = json.loads(res.data)
-        self.assertEqual(res.status_code, 422)
-        self.assertTrue(data['message'], 'request could not be processed')
-
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 0)
+        self.assertEqual(data['total_questions'], 0)
 
 
 

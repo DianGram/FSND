@@ -72,7 +72,8 @@ class Category(db.Model):
     self.type = type
 
   def format(self):
-    return {
+    # return {self.id: self.type}
+      return {
       'id': self.id,
       'type': self.type
     }
