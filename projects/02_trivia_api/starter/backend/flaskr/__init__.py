@@ -46,13 +46,15 @@ def create_app(test_config=None):
   @app.route('/categories')
   def get_all_categories():
     categories = Category.query.order_by(Category.id).all()
+    formatted_categories = format_categories(categories)
+
     if len(categories) == 0:
       abort(404)
 
     return jsonify({
       'success': True,
-      'categories': [cat.format() for cat in categories],
-      'total_categories': len(categories)
+      'categories': formatted_categories,
+      'total_categories': len(formatted_categories)
     })
 
   '''
@@ -67,13 +69,19 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+
+  def format_categories(categories):
+    cat_dict = {}
+    for cat in categories:
+      cat_dict[cat.id] = cat.type
+    return cat_dict
+
   @app.route('/questions')
   def getQuestions():
     categories = Category.query.order_by(Category.id).all()
-    formatted_categories = [cat.format() for cat in categories]
+    formatted_categories = format_categories(categories)
     questions = Question.query.order_by(Question.id).all()
     current_questions = paginate(request, questions)
-    # print('formatted categories', formatted_categories)
 
     if len(current_questions) == 0:
       abort(404)
@@ -138,13 +146,8 @@ def create_app(test_config=None):
   def search_questions():
     body = request.get_json()
     search_term = body.get('searchTerm', '')
-    print('search_term:', search_term)
-
     questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term))).all()
     result_questions = paginate(request, questions)
-    # print('questions', result_questions)
-    # print('')
-    print('total_questions:', len(questions))
     return jsonify({
       'success': True,
       'questions': result_questions,
@@ -160,6 +163,21 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+
+  @app.route('/categories/<int:category_id>/questions')
+  def questions_by_category(category_id):
+    print('category id', category_id)
+    global curr_category
+    curr_category = category_id
+    questions = Question.query.filter(Question.category == category_id).all()
+    current_questions = paginate(request, questions)
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questions': len(questions),
+      'current_category': curr_category
+    })
+
 
 
   '''

@@ -92,6 +92,22 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 0)
         self.assertEqual(data['total_questions'], 0)
 
+    def test_questions_by_category_results(self):
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'], 3)
+
+    def test_questions_by_category_no_results(self):
+        res = self.client().get('/categories/99999/questions')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 0)
+        self.assertEqual(data['total_questions'], 0)
+
 
 
 
