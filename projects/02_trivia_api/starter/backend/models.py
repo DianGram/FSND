@@ -40,13 +40,8 @@ class Question(db.Model):
 
   def insert(self):
     db.session.add(self)
-    print('self.question', self.question)
-    print('self.answer', self.answer)
-    print('self.category', self.category, type(self.category))
-    print('self.difficulty', self.difficulty)
     db.session.commit()
-    print('self.id', self.id)
-  
+
   def update(self):
     db.session.commit()
 

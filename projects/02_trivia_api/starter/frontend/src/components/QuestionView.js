@@ -59,7 +59,6 @@ class QuestionView extends Component {
   }
 
   getByCategory= (id) => {
-    alert('id = ' + id)
     $.ajax({
       url: `/categories/${id}/questions`, //TODO: update request URL
       type: "GET",

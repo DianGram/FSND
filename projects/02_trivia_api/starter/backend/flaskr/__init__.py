@@ -7,7 +7,7 @@ import random
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
-curr_category = 1
+curr_category = None
 
 
 def paginate(request, selection):
@@ -142,14 +142,12 @@ def create_app(test_config=None):
       try:
         new_question = Question(question, answer, int(category), int(difficulty))
         new_question.insert()
-        print('new id', new_question.id)
-
         return jsonify({
           'success': True,
           'added': new_question.format()
         })
       except Exception as e:
-        # print('error', e.with_traceback(), e.args)
+        print('error', e.args)
         abort(422)
     else:
       abort(400)
@@ -191,16 +189,13 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:category_id>/questions')
   def questions_by_category(category_id):
-    print('category id', category_id)
-    global curr_category
-    curr_category = category_id
+    print('in questions by category')
     questions = Question.query.filter(Question.category == category_id).all()
-    current_questions = paginate(request, questions)
     return jsonify({
       'success': True,
-      'questions': current_questions,
+      'questions': [question.format() for question in questions],
       'total_questions': len(questions),
-      'current_category': curr_category
+      'current_category': category_id
     })
 
 

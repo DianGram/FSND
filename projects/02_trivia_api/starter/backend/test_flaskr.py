@@ -99,6 +99,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_questions'], 3)
+        self.assertTrue(data['current_category'], 3)
 
     def test_questions_by_category_no_results(self):
         res = self.client().get('/categories/99999/questions')
@@ -109,7 +110,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['total_questions'], 0)
 
     def test_add_question(self):
-        print('test add q')
         res = self.client().post('/questions', json={
             'question': 'What is the largest state east of the Mississippi River?',
             'answer': 'Georgia',
@@ -122,7 +122,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['added'])
 
     def test_add_question_bad_request(self):
-        print('test add q - bad request')
         res = self.client().post('/questions', json={
             'question': 'What is the largest state east of the Mississippi River?',
             'category': 3,
@@ -134,7 +133,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'bad request')
 
     def test_add_question_method_not_allowed(self):
-        print('test add q - method not allowed')
         res = self.client().patch('/questions', json={
             'question': 'What is the largest state east of the Mississippi River?',
             'answer': 'Georgia',
