@@ -47,6 +47,7 @@ def create_app(test_config=None):
   def get_categories():
     categories = Category.query.order_by(Category.id).all()
     formatted_categories = format_categories(categories)
+    print('formatted categories', formatted_categories)
 
     if len(categories) == 0:
       abort(404)
@@ -189,7 +190,6 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:category_id>/questions')
   def questions_by_category(category_id):
-    print('in questions by category')
     questions = Question.query.filter(Question.category == category_id).all()
     return jsonify({
       'success': True,
@@ -199,18 +199,55 @@ def create_app(test_config=None):
     })
 
 
-
   '''
   @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
   and return a random questions within the given category, 
   if provided, and that is not one of the previous questions. 
-
+  
+ data: JSON.stringify({
+        previous_questions: previousQuestions,
+        quiz_category: this.state.quizCategory
+        
   TEST: In the "Play" tab, after a user selects "All" or a category,
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+
+  @app.route('/play', methods=['POST'])
+  def play_game():
+    category_id = 0
+    body = request.get_json()
+    prev_questions = body.get('previous_questions', [])
+
+    if len(prev_questions) > 4:
+      return jsonify({
+        'success': True,
+        'question': None
+      })
+
+    category = body.get('quiz_category', 0)
+    if category:
+      category_id = int(category['id'])
+
+    if category_id > 1:
+      questions = Question.query.filter(Question.category == category_id).all()
+    else:
+      questions = Question.query.all()
+
+    if len(questions) > len(prev_questions):
+      curr_questions = [q for q in questions if q.id not in prev_questions]
+      random_question = random.choice(curr_questions)
+      return jsonify({
+        'success': True,
+        'question': random_question.format()
+      })
+    else:
+      return jsonify({
+        'success': True,
+        'question': None
+      })
 
   '''
   @TODO: 
