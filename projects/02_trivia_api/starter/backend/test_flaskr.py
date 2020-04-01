@@ -108,9 +108,43 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 0)
         self.assertEqual(data['total_questions'], 0)
 
+    def test_add_question(self):
+        print('test add q')
+        res = self.client().post('/questions', json={
+            'question': 'What is the largest state east of the Mississippi River?',
+            'answer': 'Georgia',
+            'category': 3,
+            'difficulty': 3
+        })
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['added'])
 
+    def test_add_question_bad_request(self):
+        print('test add q - bad request')
+        res = self.client().post('/questions', json={
+            'question': 'What is the largest state east of the Mississippi River?',
+            'category': 3,
+            'difficulty': 3
+        })
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
-
+    def test_add_question_method_not_allowed(self):
+        print('test add q - method not allowed')
+        res = self.client().patch('/questions', json={
+            'question': 'What is the largest state east of the Mississippi River?',
+            'answer': 'Georgia',
+            'category': 3,
+            'difficulty': 3
+        })
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
 
 
 # Make the tests conveniently executable

@@ -44,7 +44,7 @@ def create_app(test_config=None):
   for all available categories.
   '''
   @app.route('/categories')
-  def get_all_categories():
+  def get_categories():
     categories = Category.query.order_by(Category.id).all()
     formatted_categories = format_categories(categories)
 
@@ -131,6 +131,31 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
 
+  @app.route('/questions', methods=['POST'])
+  def add_question():
+    body = request.get_json()
+    question = body.get('question', None)
+    answer = body.get('answer', None)
+    category = body.get('category', None)
+    difficulty = body.get('difficulty', None)
+    if question and answer:
+      try:
+        new_question = Question(question, answer, int(category), int(difficulty))
+        new_question.insert()
+        print('new id', new_question.id)
+
+        return jsonify({
+          'success': True,
+          'added': new_question.format()
+        })
+      except Exception as e:
+        # print('error', e.with_traceback(), e.args)
+        abort(422)
+    else:
+      abort(400)
+
+
+
   '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
@@ -198,6 +223,14 @@ def create_app(test_config=None):
   including 404 and 422. 
   '''
 
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      'success': False,
+      'error': 400,
+      'message': 'bad request'
+    }), 400
+
   @app.errorhandler(404)
   def not_found(error):
     return jsonify({
@@ -206,8 +239,16 @@ def create_app(test_config=None):
       'message': 'resource not found'
     }), 404
 
-  @app.errorhandler(422)
+  @app.errorhandler(405)
   def not_found(error):
+    return jsonify({
+      'success': False,
+      'error': 405,
+      'message': 'method not allowed'
+    }), 405
+
+  @app.errorhandler(422)
+  def could_not_be_processed(error):
     return jsonify({
       'success': False,
       'error': 422,

@@ -29,7 +29,7 @@ class Question(db.Model):
   id = Column(Integer, primary_key=True)
   question = Column(String)
   answer = Column(String)
-  category = Column(String)
+  category = Column(Integer)
   difficulty = Column(Integer)
 
   def __init__(self, question, answer, category, difficulty):
@@ -40,7 +40,12 @@ class Question(db.Model):
 
   def insert(self):
     db.session.add(self)
+    print('self.question', self.question)
+    print('self.answer', self.answer)
+    print('self.category', self.category, type(self.category))
+    print('self.difficulty', self.difficulty)
     db.session.commit()
+    print('self.id', self.id)
   
   def update(self):
     db.session.commit()
@@ -71,9 +76,3 @@ class Category(db.Model):
   def __init__(self, type):
     self.type = type
 
-  # def format(self):
-  #   return {self.id: self.type}
-  #   #   return {
-  #   #   'id': self.id,
-  #   #   'type': self.type
-  #   # }
