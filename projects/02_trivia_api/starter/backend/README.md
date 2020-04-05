@@ -66,30 +66,6 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
-```
-
-
 ## Testing
 To run the tests, run
 ```
@@ -98,3 +74,236 @@ createdb trivia_test
 psql trivia_test < trivia.psql
 python test_flaskr.py
 ```
+
+
+#API Reference
+##Endpoints
+
+GET /categories
+- gets all categories
+- Request Arguments: None
+- Returns: A dictionary containing all categories, with id and name
+- Sample: `curl http://127.0.0.1:5000/categories`
+- Response:
+```
+{
+   '1' : "Science", 
+   '2' : "Art", 
+   '3' : "Geography",
+   '4' : "History", 
+   '5' : "Entertainment", 
+   '6' : "Sports"
+}
+```
+
+
+GET /questions
+- gets all questions
+- Request Arguments: optional, page number to display
+- Returns: A list of question objects, success value, total number of questions, current category, and a dictionary of categories.  Results are paginated in groups of 10.  
+- Sample: `curl http://127.0.0.1:5000/questions?page=2`
+- Response:
+```
+{
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  }, 
+  "current_category": null, 
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+    {
+      "answer": "Tom Cruise", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 4, 
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }, 
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }, 
+    {
+      "answer": "Edward Scissorhands", 
+      "category": 5, 
+      "difficulty": 3, 
+      "id": 6, 
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }, 
+    {
+      "answer": "Muhammad Ali", 
+      "category": 4, 
+      "difficulty": 1, 
+      "id": 9, 
+      "question": "What boxer's original name is Cassius Clay?"
+    }, 
+    {
+      "answer": "Brazil", 
+      "category": 6, 
+      "difficulty": 3, 
+      "id": 10, 
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    }, 
+    {
+      "answer": "Uruguay", 
+      "category": 6, 
+      "difficulty": 4, 
+      "id": 11, 
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }, 
+    {
+      "answer": "George Washington Carver", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 12, 
+      "question": "Who invented Peanut Butter?"
+    }, 
+    {
+      "answer": "Lake Victoria", 
+      "category": 3, 
+      "difficulty": 2, 
+      "id": 13, 
+      "question": "What is the largest lake in Africa?"
+    }, 
+    {
+      "answer": "The Palace of Versailles", 
+      "category": 3, 
+      "difficulty": 3, 
+      "id": 14, 
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 32
+}
+```
+
+GET /categories/{category_id}/questions
+- Lists all the questions for a given category
+- Request Arguments: id of the requested category
+- Returns: A list of question objects that have the given category, success value, current category, and total number of questions returned
+- Sample: `curl http://127.0.0.1:5000/categories/6/questions`
+- Response:
+```
+{
+  "current_category": 6, 
+  "questions": [
+    {
+      "answer": "Brazil", 
+      "category": 6, 
+      "difficulty": 3, 
+      "id": 10, 
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    }, 
+    {
+      "answer": "Uruguay", 
+      "category": 6, 
+      "difficulty": 4, 
+      "id": 11, 
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 2
+}
+
+```
+
+POST /questions
+- Creates a new question object with the given question, answer, difficulty and category 
+- Request Arguments: question, answer, difficulty, category
+- Returns: The question object that was created and success value
+- Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"question": "What is the first letter of the alphabet?", "answer": "A", "difficulty": "1", "category": "2"}'`
+- Response:
+```
+{
+  "added": {
+    "answer": "A", 
+    "category": 2, 
+    "difficulty": 1, 
+    "id": 48, 
+    "question": "What is the first letter of the alphabet?"
+  }, 
+  "success": true
+}
+
+```
+
+POST /questions/search
+- Finds all question objects whose question contains the given search term
+- Request Arguments: searchTerm - the term to search for
+- Returns: A list of question objects whose question contains the given search term
+- Sample: `curl http://127.0.0.1:5000/questions/search -X POST -H "Content-Type: application/json" -d '{"searchTerm": "title"}'`
+- Response:
+```
+{
+  "questions": [
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }, 
+    {
+      "answer": "Edward Scissorhands", 
+      "category": 5, 
+      "difficulty": 3, 
+      "id": 6, 
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 2
+}
+
+
+```
+DELETE /questions/{question_id}
+- Request Arguments: id of the question to be deleted
+- Returns: The id that was deleted and success value
+- Sample: `curl http://127.0.0.1:5000/questions/47 -X DELETE`
+- Response:
+```
+  {
+  "deleted": 47, 
+  "success": true
+}
+```
+
+POST /quizzes
+- Allows the user to play the trivia quiz game.  Returns one question at a time in the selected category.  Five questions (less if there are less than 5 questions in a category) may be played in one game.  After 5 questions, the user is given their score and asked if they would like to play again.  This is not available through the API, but is included here for thoroughness.
+
+##Errors
+Flaskr uses standard HTTP response codes to indicate the success or failture of an API request.
+Errors are returned as JSON objects in the following format:
+```
+{
+  "error": 404, 
+  "message": "resource not found", 
+  "success": false
+}
+```
+Specific error codes are:
+- 400 - Bad request.  The request was unacceptable, often due to a missing or invalid parameter
+- 404 - Not found.  The request resource doesn't exist
+- 405 - Method not allowed.  The requested method is not allowed for the endpoint
+- 500 - Unprocessable.  Internal server error
+##Authors
+Coach Caryn and Dianne Gramling
+
+##Acknowledgemets
+Thanks to Coach Caryn and the Udacity team
