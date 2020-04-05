@@ -76,8 +76,8 @@ python test_flaskr.py
 ```
 
 
-#API Reference
-##Endpoints
+# API Reference
+## Endpoints
 
 GET /categories
 - gets all categories
@@ -302,8 +302,8 @@ Specific error codes are:
 - 404 - Not found.  The request resource doesn't exist
 - 405 - Method not allowed.  The requested method is not allowed for the endpoint
 - 500 - Unprocessable.  Internal server error
-##Authors
+## Authors
 Coach Caryn and Dianne Gramling
 
-##Acknowledgemets
+## Acknowledgemets
 Thanks to Coach Caryn and the Udacity team
