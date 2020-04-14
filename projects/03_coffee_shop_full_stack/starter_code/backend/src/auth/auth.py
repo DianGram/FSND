@@ -8,7 +8,7 @@ AUTH0_DOMAIN = 'fsnd-coffeeshop.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'Coffee'
 
-## AuthError Exception
+# AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
@@ -21,7 +21,7 @@ class AuthError(Exception):
         self.status_code = status_code
 
 
-## Auth Header
+# Auth Header
 
 def get_token_auth_header():
     auth = request.headers.get('Authorization', None)
@@ -107,7 +107,8 @@ def verify_decode_jwt(token):
         except jwt.JWTClaimsError:
             raise AuthError({
                 'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please check the audience and issuer.'
+                'description': 'Incorrect claims. Please check the audience '
+                               'and issuer.'
             }, 401)
         except Exception:
             raise AuthError({

@@ -14,7 +14,7 @@ CORS(app)
 
 # db_drop_and_create_all()
 
-## ROUTES
+# ROUTES
 
 
 @app.route('/drinks')
@@ -30,7 +30,7 @@ def get_drinks():
             'success': True,
             'drinks': drinks
         })
-    except:
+    except Exception:
         # print('Error:', sys.exc_info())
         abort(422)
 
@@ -49,7 +49,7 @@ def get_drinks_detail(token):
             'success': True,
             'drinks': drinks
         })
-    except:
+    except Exception:
         # print('Error:', sys.exc_info())
         abort(422)
 
@@ -88,6 +88,8 @@ def udpate_drink(token, drink_id):
         abort(404)
 
     data = request.get_json()
+    if not data:
+        abort(400)
     drink.title = data.get('title', drink.title)
     recipe = data.get('recipe', drink.recipe)
     drink.recipe = json.dumps(recipe)
@@ -98,7 +100,8 @@ def udpate_drink(token, drink_id):
             'success': True,
             'drinks': [drink.long()]
         })
-    except:
+    except Exception:
+        print('Error:', sys.exc_info())
         abort(422)
 
 
@@ -114,11 +117,11 @@ def delete_drink(token, drink_id):
             'success': True,
             'delete': drink_id
         })
-    except:
+    except Exception:
         abort(422)
 
 
-## Error Handling
+# Error Handling
 '''
 Example error handling for unprocessable entity
 '''
@@ -140,6 +143,15 @@ def not_found(error):
         "error": 404,
         "message": "resource not found"
     }), 404
+
+
+@app.errorhandler(400)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": "bad request"
+    }), 400
 
 
 @app.errorhandler(AuthError)
